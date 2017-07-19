@@ -1,5 +1,5 @@
 {
-  "name": "Zean/SimDI",
+  "name": "zean/sim-di",
   "description": "simple dependency inject container",
   "minimum-stability": "stable",
   "license": "MIT",
