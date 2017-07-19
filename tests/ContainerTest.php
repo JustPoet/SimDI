@@ -48,4 +48,13 @@ class ContainerTest extends TestCase
         $driver = $this->container->$name;
         $this->assertEquals('Benz', $driver->drive());
     }
+
+    public function testCustomParam()
+    {
+        $ae86 = new AE86();
+        $ae86->setManufacture('TOYOTA');
+
+        $driver = $this->container->get(Driver::class, $ae86);
+        $this->assertEquals('TOYOTA:AE86', $driver->drive());
+    }
 }
