@@ -5,6 +5,7 @@ namespace SimDI;
 use ArrayAccess;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
+use SimDI\Exception\ContainerException;
 use SimDI\Exception\NotFoundException;
 use stdClass;
 
@@ -118,7 +119,7 @@ class Container implements ArrayAccess, ContainerInterface
             $className = $classObj->name;
         }
         if (empty($className)) {
-            throw new NotFoundException('class dose not exist', -100);
+            throw new NotFoundException($className . ' dose not exist', -100);
         }
 
         return $className;
@@ -163,6 +164,7 @@ class Container implements ArrayAccess, ContainerInterface
 
     public function offsetSet($offset, $value)
     {
+        throw new ContainerException('set object is forbidden!', -200);
     }
 
     public function offsetUnset($offset)
