@@ -87,14 +87,18 @@ class Container implements ArrayAccess, ContainerInterface
         $parameterClasses = $constructor ? $constructor->getParameters() : [];
 
         if (empty($parameterClasses)) {
-            return $class->newInstance();
+            $obj = $class->newInstance();
+            $obj->app = $this;
+            return $obj;
         } else {
             foreach ($parameterClasses as $parameterClass) {
                 $paramClass = $parameterClass->getClass();
                 $params[] = $this->factory($paramClass);
             }
 
-            return $class->newInstanceArgs($params);
+            $obj = $class->newInstanceArgs($params);
+            $obj->app = $this;
+            return $obj;
         }
     }
 
