@@ -66,11 +66,12 @@ class Container implements ArrayAccess, ContainerInterface
     /**
      * @param string|ReflectionClass $class
      * @param array                  $params
+     * @param array                  $cache
      *
      * @return object
      * @throws NotFoundException
      */
-    protected function factory($class, $params = [])
+    protected function factory($class, $params = [], &$cache = [])
     {
         $class = new ReflectionClass($this->getClassName($class));
 
@@ -93,7 +94,15 @@ class Container implements ArrayAccess, ContainerInterface
         } else {
             foreach ($parameterClasses as $parameterClass) {
                 $paramClass = $parameterClass->getClass();
-                $params[] = $this->factory($paramClass);
+
+                if (isset($cache[$paramClass->name])) {
+                    $obj = $cache[$paramClass->name];
+                } else {
+                    $obj = $this->factory($paramClass, [], $cache);
+                    $cache[$paramClass->name] = $obj;
+                }
+
+                $params[] = $obj;
             }
 
             $obj = $class->newInstanceArgs($params);
@@ -121,7 +130,10 @@ class Container implements ArrayAccess, ContainerInterface
             && !$classObj->isInterface()
         ) {
             $className = $classObj->name;
+        } elseif ($classObj instanceof ReflectionClass) {
+            $className = $classObj->name;
         }
+
         if (empty($className)) {
             throw new NotFoundException($className . ' dose not exist', -100);
         }
