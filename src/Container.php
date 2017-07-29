@@ -26,6 +26,9 @@ class Container implements ArrayAccess, ContainerInterface
      */
     protected $contractsMapping;
 
+    /**
+     * @var bool
+     */
     protected $reuse;
 
     private function __construct($contractsMapping, $reuse)
