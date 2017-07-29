@@ -26,9 +26,12 @@ class Container implements ArrayAccess, ContainerInterface
      */
     protected $contractsMapping;
 
-    private function __construct($contractsMapping)
+    protected $reuse;
+
+    private function __construct($contractsMapping, $reuse)
     {
         $this->contractsMapping = $contractsMapping;
+        $this->reuse = $reuse;
     }
 
     private function __clone()
@@ -95,11 +98,15 @@ class Container implements ArrayAccess, ContainerInterface
             foreach ($parameterClasses as $parameterClass) {
                 $paramClass = $parameterClass->getClass();
 
-                if (isset($cache[$paramClass->name])) {
-                    $obj = $cache[$paramClass->name];
+                if ($this->reuse) {
+                    if (isset($cache[$paramClass->name])) {
+                        $obj = $cache[$paramClass->name];
+                    } else {
+                        $obj = $this->factory($paramClass, [], $cache);
+                        $cache[$paramClass->name] = $obj;
+                    }
                 } else {
-                    $obj = $this->factory($paramClass, [], $cache);
-                    $cache[$paramClass->name] = $obj;
+                    $obj = $this->factory($paramClass);
                 }
 
                 $params[] = $obj;
@@ -143,13 +150,14 @@ class Container implements ArrayAccess, ContainerInterface
 
     /**
      * @param array $contractsMapping
+     * @param bool  $isReuse
      *
      * @return Container
      */
-    public static function getInstance($contractsMapping = [])
+    public static function getInstance($contractsMapping = [], $isReuse = false)
     {
         if (null === static::$instance) {
-            static::$instance = new static($contractsMapping);
+            static::$instance = new static($contractsMapping, $isReuse);
         }
 
         return static::$instance;
